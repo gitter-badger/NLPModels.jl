@@ -10,9 +10,13 @@ export reset!,
        jac_coord, jac, jprod, jprod!, jtprod, jtprod!,
        jth_hprod, jth_hprod!, ghjvprod, ghjvprod!,
        hess_coord, hess, hprod, hprod!, hess_op,
+       push!,
        varscale, lagscale, conscale,
        NLPtoMPB, NotImplementedError
 
+# import methods we override
+import Base.push!
+import LinearOperators.reset!
 
 include("nlp_utils.jl");
 include("nlp_types.jl");
@@ -214,6 +218,8 @@ function hess_op(nlp :: AbstractNLPModel, x :: Vector{Float64};
   return LinearOperator(nlp.meta.nvar, Float64, v -> hprod(nlp, x, v; obj_weight=obj_weight, y=y))
 end
 
+push!(nlp :: AbstractNLPModel, args...; kwargs...) =
+  throw(NotImplementedError("push!"))
 varscale(nlp :: AbstractNLPModel, args...; kwargs...) =
   throw(NotImplementedError("varscale"))
 lagscale(nlp :: AbstractNLPModel, args...; kwargs...) =
@@ -236,5 +242,6 @@ end
 include("simple_model.jl")
 
 include("slack_model.jl")
+include("qn_model.jl")
 
 end # module
